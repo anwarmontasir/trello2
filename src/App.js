@@ -42,6 +42,46 @@ class App extends React.Component {
       'm': { id: 'm', title: 'Thirteenth card', content: 'lorem ipsum' },
     }
   }
+
+  handleDeleteCard = (card, list) => {
+    const {lists, allCards} = this.state;
+    for (let i=0; i<lists.length; i++) {
+      if (lists[i].id === list) {
+        const newList = lists[i].cardIds.filter(item => item !== card);
+        lists[i].cardIds = newList;
+      }
+    }
+    this.setState({
+      lists: lists,
+      allCards: allCards
+    })
+  }
+
+  handleRandomCard = (list) => {
+    const {lists, allCards} = this.state;
+    const newRandomCard = () => {
+      const id = Math.random().toString(36).substring(2, 4)
+        + Math.random().toString(36).substring(2, 4);
+      return {
+        id,
+        title: `Random Card ${id}`,
+        content: 'lorem ipsum',
+      }
+    }
+    const newRandCard = newRandomCard();
+    allCards[newRandCard.id] = newRandCard;
+    for (let i=0; i<lists.length; i++) {
+      if (lists[i].id === list) {
+        console.log(lists[i]);
+        lists[i].cardIds.push(newRandCard.id);
+      }
+    }
+    this.setState({
+      lists: lists,
+      allCards: allCards
+    })
+  }
+
   render() {
     return (
       <main className='App'>
@@ -51,9 +91,11 @@ class App extends React.Component {
         <div className='App-list'>
           {this.state.lists.map(list => (
             <List
-              key={list.id}
+              key={list.id} listId={list.id}
               header={list.header}
               cards={list.cardIds.map(id => this.state.allCards[id])}
+              onDeleteCard={this.handleDeleteCard} 
+              onAddCard={this.handleRandomCard}
             />
           ))}
         </div>
